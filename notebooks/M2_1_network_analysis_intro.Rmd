@@ -13,7 +13,6 @@ output:
     theme: flatly
 ---
 
-
 ```{r setup, include=FALSE}
 ### Generic preamble
 Sys.setenv(LANG = "en") # For english language
@@ -34,11 +33,12 @@ pacman::p_load(tidyverse, # Standard datasciewnce toolkid (dplyr, ggplot2 et al.
                igraph, # For network analysis
                tidygraph, # For tidy-style graph manipulation
                ggraph, # For ggplot2 style graph plotting
-               Matrix # For some matrix functionality
+               Matrix, # For some matrix functionality
+               ggforce # Awesome plotting
                )
 ```
 
-Welcome to your introduction to network analysis. In this session you will learn:
+Welcome to your first part of the introduction to network analysis. In this session you will learn:
 
 1. Why applying network analysis is helpful to answer certain questions, and why framing certain contexts as networks gives new insights.
 2. The basic structure of relational data.
@@ -62,7 +62,20 @@ First of all, what is a network? Plainly speaking, a network is a **system** of 
 
 The whole system is (surprise, surprise) usually called a **network** or **graph**. The elements are commonly referred to as **nodes** (system theory jargon) or **vertices** (graph theory jargon) of a graph, while the connections are **edges** or **links**. I will mostly refer to the elements as nodes, and their connections as edges.
 
-![](https://www.dropbox.com/s/w2dlzggcsxr00xp/networks_nodes_edges.png?dl=1){width=500px}
+```{r, echo=FALSE}
+tibble(from = c(1,2,3,1), to = c(3,1,5,5), text = rep("Edge", 4)) %>% 
+  as_tbl_graph() %N>%
+  mutate(text = "Node") %>%
+  ggraph(layout = "nicely") +
+  geom_node_point(size = 10, col = "skyblue") + 
+  geom_node_text(aes(label = name)) +
+  geom_edge_link(aes(label = text, alpha = 0.5)) +
+  theme_graph() +
+  labs(title = "What is a network?", subtitle = "A system of elements (nodes/vertices) and connections (edges) between them") +
+  geom_mark_ellipse(aes(x, y, label = "Node / Vertex", 
+                        description = "Elements in the system",
+                        filter = name == 1)) 
+```
 
 Generally, networks are a form of representing **relational data**. This is a very general tool that can be applied to many different types of relationships between all kind of elements. The content, meaning, and interpretation for sure depends on what elements we display, and which types of relationships. For example:
 
@@ -298,13 +311,20 @@ g %N>%
   as_tibble()
 ```
 
+### MAnipulating graphs
+
+XXXX MErging etc
+
+
+### Visualization (preview)
+
 One last thing for now: While `igraph` also provides a powerful network visualization functionality, I will also mostly go with Thomas sister package, [`ggraph`](https://github.com/thomasp85/ggraph), which provides a network visualization interface compatible and consistent with `ggplot2`
 
 The rest works like any ggplot2 function call, just that we use special geoms for our network, like geom_edge_density() to draw a shadow where the edge density is higher, geom_edge_link() to connect edges with a straight line, geom_node_point() to draw node points and geom_node_text() to draw the labels. More options can be found here.
 
 ```{r}
 library(ggraph)
-g %>% ggraph(layout = 'nicely') + 
+g %>% ggraph(layout = "nicely") + 
   geom_edge_link() + 
   geom_node_point() + 
   geom_node_text(aes(label = name))
