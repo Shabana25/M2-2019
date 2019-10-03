@@ -1,0 +1,855 @@
+---
+title: 'M2-1-2: Introduction to Network Analysis'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "06/10/2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: true
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+Sys.setenv(LANG = "en")
+
+### Clean Workspace (I like to start clean)
+rm(list=ls()); graphics.off() # get rid of everything in the workspace
+detachAllPackages <- function() { # Also, detach packages to avoid functions masked by others
+  basic.packages <- c("package:stats","package:graphics","package:grDevices","package:utils","package:datasets","package:methods","package:base")
+  package.list <- search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
+  package.list <- setdiff(package.list,basic.packages)
+  if (length(package.list)>0)  for (package in package.list) detach(package, character.only=TRUE)
+}
+detachAllPackages(); rm(detachAllPackages)
+
+### checking if all we need is installed
+list.of.packages <- c("knitr", "tidyverse", "magrittr", "data.table", "skimr")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+rm(list.of.packages, new.packages)
+
+### Load packages  Standard
+library(knitr) # For display of the markdown
+library(tidyverse) # Collection of all the good stuff like dplyr, ggplot2 ect.
+library(magrittr) # For extra-piping operators (eg. %<>%)
+library(data.table) # Good format to work with large datasets
+library(skimr) # Nice descriptives
+
+
+### Knitr options
+opts_chunk$set(warning = FALSE,
+               message = FALSE,
+               fig.align  = "center"
+               )
+```
+
+Some housekeeping (again), installing necessary packages.
+
+```{r}
+list.of.packages <- c("igraph", "tidygraph", "ggraph")
+
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+rm(list.of.packages, new.packages)
+```
+
+
+# Introduction
+
+Again, the executable kaggle notebook can be found [here](https://kaggle.com/danielhain/sds-2018-m2-3-nw-advanced).
+
+## Reminder: What's the deal about networks
+
+* Looking at systems as a network often brings a fresh perspective
+* It's a completely different data-concept
+* By definition, things are relational, so **they somewhat depend on each others** (vs. independent observations in a dataframe)
+* It's kind of messy
+* But it makes pretty and impressive graphs
+* It has its own rules, semantics, indicators, algorithms
+
+## The Data Structure of Graphs
+
+So, briefly back to the questions: Why all the fuzz with graph objects and the like?
+
+* Tabular data
+     * In tabular data, summary statistics of variables are **between observations** (column-wise) interdependent, meaning changing a value of some observation will change the corresponding variables summary statistics.
+     * LIkewise, variable values might be **within observation** interdependent (row-wise), meaning changing a variable value might change summary statistics of the observation
+     * Otherwise, values are (at least mathematically) independent.
+* Graph data
+     * Same holds true, but adittional interdependencies due to the relational structure of the data.
+     * Sepperation between **node** and **edge** data, which is interdependent. Removing a node might alos impy the removal of edges, removal of edges changes the characteristics of nodes
+     * In adittion, the relational structure makes that not only true for adjacent nodes and edges, but potentially multiple. Adding/Removing one node/edge could change the characteristics of every single other node/edge.
+     * That is less of a problem for local network characteristics (eg., a node's degree on level 1). However, many node and edge characteristics such
+     * That's mainly why graph computing is slightly more messy, and need own mathematical tools, and applications from graphical computing (graphical like graph, not like figure)
+
+![](../media/M2_2_data_structure.png){width=500px}
+
+# Network Structures II
+
+## Introduction to the case
+
+Emmanuel Lazega, The Collegial Phenomenon: The Social Mechanisms of Cooperation Among Peers in a Corporate Law Partnership, Oxford University Press (2001).
+
+This data set comes from a network study of corporate law partnership that was carried out in a Northeastern US corporate law firm, referred to as SG&R, 1988-1991 in New England. It includes (among others) measurements of networks among the 71 attorneys (partners and associates) of this firm, i.e. their strong-coworker network, advice network, friendship network, and indirect control networks. Various members' attributes are also part of the dataset, including seniority, formal status, office in which they work, gender, lawschool attended, individual performance measurements (hours worked, fees brought in), attitudes concerning various management policy options, etc. This dataset was used to identify social processes such as bounded solidarity, lateral control, quality control, knowledge sharing, balancing powers, regulation, etc. among peers.
+
+The setting:
+
+* What do corporate lawyers do? Litigation and corporate work.
+* Division of work and interdependencies.
+* Three offices, no departments, built-in pressures to grow, intake and assignment rules.
+* Partners and associates: hierarchy, up or out rule, billing targets.
+* Partnership agreement (sharing benefits equally, 90% exclusion rule, governance structure, elusive committee system) and incompleteness of the contracts.
+* Informal, unwritten rules (ex: no moonlighting, no investment in buildings, no nepotism, no borrowing to pay partners, etc.).
+* Huge incentives to behave opportunistically ; thus the dataset is appropriate for the study of social processes that make cooperation among rival partners possible. 
+* Sociometric name generators used to elicit coworkers, advice, and 'friendship' ties at SG&R:"Here is the list of all the members of your Firm."
+
+The networks where created according to the follwoing questionaire:
+
+* Strong coworkers network: "Because most firms like yours are also organized very informally, it is difficult to get a clear idea of how the members really work together. Think back over the past year, consider all the lawyers in your Firm. Would you go through this list and check the names of those with whom you have worked with. By "worked with" I mean that you have spent time together on at least one case, that you have been assigned to the same case, that they read or used your work product or that you have read or used their work product; this includes professional work done within the Firm like Bar association work, administration, etc."
+* Basic advice network: "Think back over the past year, consider all the lawyers in your Firm. To whom did you go for basic professional advice? For instance, you want to make sure that you are handling a case right, making a proper decision, and you want to consult someone whose professional opinions are in general of great value to you. By advice I do not mean simply technical advice."
+* 'Friendship' network:
+"Would you go through this list, and check the names of those you socialize with outside work. You know their family, they know yours, for instance. I do not mean all the people you are simply on a friendly level with, or people you happen to meet at Firm functions."
+
+## Preperation
+
+###  Load the data
+```{r}
+mat.friendship <- fread("../input/socio/ELfriend.dat", data.table = FALSE) %>% as.matrix()
+mat.advice <- fread("../input/socio/ELadv.dat", data.table = FALSE) %>% as.matrix()
+mat.work <- fread("../input/socio/ELwork.dat", data.table = FALSE) %>% as.matrix()
+attributes <- fread("../input/socio/ELattr.dat", data.table = FALSE) 
+```
+
+The three networks refer to cowork, friendship, and advice. The first 36 respondents are the partners in the firm. 
+
+### Cleaning up
+
+The attribute variables in the file ELattr.dat are:
+
+* seniority status (1=partner; 2=associate)
+* gender (1=man; 2=woman)
+* office (1=Boston; 2=Hartford; 3=Providence)
+* years with the firm
+* age
+* practice (1=litigation; 2=corporate)
+* law school (1: harvard, yale; 2: ucon; 3: other)
+
+```{r}
+colnames(attributes) <- c("id", "seniority", "gender", "office", "tenure", "age", "practice", "school")
+   
+attributes %<>%
+  mutate(seniority = recode(seniority, "1" = "Partner", "2" = "Associate"),
+         gender = recode(gender, "1" = "Man", "2" = "Woman"),
+         office = recode(office, "1" = "Boston", "2" = "Hartford", "3" = "Providence"),
+         practice = recode(practice, "1" = "Litigation", "2" = "Corporate"),
+         school = recode(school, "1" = "Harvard, Yale", "2" = "Ucon", "3" = "Others"))   
+    
+head(attributes)
+skim(attributes)
+```
+
+
+### Generate the graph
+
+```{r}
+require(igraph)
+g <- graph_from_adjacency_matrix(mat.advice, 
+                                 mode = "directed")
+g$type <- "friendship"
+
+V(g)$name <- 1:vcount(g)
+V(g)$gender <- attributes$gender
+V(g)$office <- attributes$office
+V(g)$age <- attributes$age
+V(g)$tenure <- attributes$tenure
+V(g)$practice <- attributes$practice
+V(g)$school <- attributes$school
+E(g)$type <- "friendship"
+g 
+```
+
+Lets take a look
+
+```{r,fig.width=15,fig.height=15}
+plot(g,
+     layout= layout_with_fr(g),
+     vertex.label = degree(g, mode = "in"),
+     vertex.size = 1+ sqrt(degree(g, mode = "in")),
+     vertex.color = as.numeric(factor(V(g)$office)),
+     vertex.label = NA,
+     edge.arrow.size = 0.5)
+```
+
+
+
+## Network effects & structures
+
+### Node level (local)
+
+We could look at all the node level characteristics (degree, betweenness etc.) again, but for the sake of time I skip that for now, since its all already in the last notebook.
+
+### Network level (global)
+
+Ok, lets do the whole exercise with getting the main-determinants of the network structure again. We can look at the classical structural determinants.
+
+```{r}
+# Get density of a graph
+edge_density(g)
+
+# Get the diameter of the graph g
+diameter(g, directed = TRUE)
+
+# Get the average path length of the graph g
+mean_distance(g, directed = TRUE)
+
+# Transistivity
+transitivity(g, type ="global")
+
+# recipricity
+reciprocity(g)
+```
+
+The last two ones make even mores sense in social networks, don't they?
+
+We have another important concept that often explains edge-formation: **Assortativity**, anso called **homopholy**. This is a measure of how preferentially attached vertices are to other vertices with identical attributes. In other words: How much "*birds of the same feather flock together *".
+
+Lets first look at people of the same tenure flock together.
+
+```{r}
+assortativity(g, V(g)$tenure, directed = TRUE)
+```
+
+What about people from elite universities?
+
+
+```{r}
+assortativity(g, V(g)$school == "Harvard, Yale", directed = TRUE)
+```
+
+Lastly, what about the popularity (or "Matthew") effect?
+
+```{r}
+assortativity(g, degree(g, mode = "in"), directed = TRUE)
+```
+
+Also not that much.....
+
+One more thing we didn't talk about yet: Small worlds.
+
+Small worlds are an interesting network structure, combining short path lenght betwen the nodes with a high clustering coefficient. That means, that we have small interconected clusters, which are in turn connected by **gatekeepers** (the edges we call **bridges** or **structural holes**). 
+
+![](../media/M2_1_smallworld2.jpg){width=500px}
+
+This leads to an interesting setup, which has proven to be conductive for efficient communication and fast diffusion of information in social networks.
+
+![](../media/M2_1_smallworld1.jpg){width=500px}
+
+We calculate it for now in an easy way:
+
+```{r}
+transitivity(g, type ="global") / mean_distance(g, directed = TRUE)
+```
+
+However, you by now probably wonder how to interprete this numbers. Are they high, low, or whatever? What is the reference? In fact, it's very hard to say. The best way to say something about that is to compare it with what a random network would look like.
+
+So, lets create a random network. Here, we use the `erdos.renyi.game()` function, which creates a network with a given number of nodes and edge-density, but where the edges are constructed completely random.
+
+```{r}
+g.r <- erdos.renyi.game(n = gorder(g), 
+                        p.or.m = gsize(g), 
+                        type = "gnm",
+                        directed = TRUE,
+                        loops = FALSE)
+plot(g.r)
+```
+
+Looks kind of different. However, one randomly created network doesn't present a good abseline. So, lets better create a bunch, and compare our network to the average values of the randomly generated ones.
+
+```{r}
+# Generate 1000 random graphs
+g.l <- vector('list',1000)
+  
+for(i in 1:1000){
+  g.l[[i]] <- erdos.renyi.game(n = gorder(g), 
+                        p.or.m = gsize(g), 
+                        type = "gnm",
+                        directed = TRUE,
+                        loops = FALSE)
+}
+```
+
+
+Now we can see how meaningful our observed network statistics are, by comparing them with the mean of the statistics in the random network.
+
+```{r}
+# Calculate average path length of 1000 random graphs
+dist.r <- mean(unlist(lapply(g.l, mean_distance, directed = TRUE)))
+cc.r <- mean(unlist(lapply(g.l, transitivity, type ="global")))
+rp.r <- mean(unlist(lapply(g.l, reciprocity)))
+```
+
+Lets see:
+
+```{r}
+stats.friend <- tibble(density = edge_density(g),
+                       diameter = diameter(g, directed = TRUE),
+                       reciprocity = reciprocity(g),
+                       reciprocity.score = mean(reciprocity(g) > rp.r),
+                       distance = mean_distance(g, directed = TRUE),
+                       distance.score = mean(mean_distance(g, directed = TRUE) > dist.r),
+                       clustering = transitivity(g, type ="global"),
+                       clustering.score = mean(transitivity(g, type ="global")  > cc.r),
+                       small.world = mean(transitivity(g, type ="global")  > cc.r) / mean(mean_distance(g, directed = TRUE) > dist.r) )
+
+stats.friend
+```
+
+
+## Your turn
+
+Its time for you to explore the data a bit on your own. You can find it  [here](https://www.kaggle.com/danielhain/sds-2018-m2-3-nw-exercise-1).
+
+
+
+
+# Multi-Modal Networks
+
+Now its time to talk about an interesting type of networks, multi-modal. This means, a network has several "modes", meaning connects entities on different conceptual levels. The most commone one is a **2-mode** (or **bipartite**) network. Examples could be an Author $\rightarrow$ Paper, Inventor $\rightarrow$ Patent, Member $\rightarrow$ Club network. Here, the elements in the different modes represent different things. 
+
+We can alalyse them in sepperation (and sometimes we should), but often its helpful to "project"" them onto one mode. Here, we create a node in one mode by joint association with another mode.
+
+![](../media/M2_3_2mode.png){width=500px}
+
+While that sounds simple, it can be a very powerful technique, as I will demonstrate now.
+
+
+
+# Case study: Bibliographic networks
+
+## Basics
+
+Lets talk about bibliographic networks. In short, that are networks between documents which cite each others. That can be (commonly) academic publications, but also patents or policy reports. Conceptually, we can see them as 2 mode networks, between articles and their reference. That helps us to apply some interesting metrics, such as:
+
+* direct citations
+* Bibliographic coupling
+* Co--citations
+
+Interestingly, different projections of this 2-mode network give the whole resulting 1-mode network a different meaning.
+
+![](../media/M2_3_biblio.png){width=500px}
+
+I will illustrate more in detail in the following.
+
+## Doing it by hand
+
+Lets imagine we do it the hard way. We download some bibliographic data, and have to do all the munging on our own, till we end up with a nice network representation. Lets go through some of these steps together.
+
+The example is absed on some own work, which is currently under revision, but made available for you:
+
+[Rakas, M and Hain, D, (under revision), "Innovation System Research: Where It
+Came From, and What It Is Now"](https://rawgit.com/SDS-AAU/M2-2018/master/material/The_Development_of_Innovation_System_Research_RR1.pdf)
+
+Lets get started. I will load some bibliographic data (selection process explained in the paper) on articles concerned with the field of "Innovation Studies". It already went through some upfront cleaning, but is very similar to what you get when you download data from WoS.
+
+
+```{r}
+rm(list=ls())
+
+articles <- readRDS("../input/biblio/publications.RDS")
+
+articles %<>%
+  select(SR, AU, TI, JI, PY, AU_UN, DE, TC, NR, CR) %>%
+  rename(article = SR,
+         author = AU,
+         title = TI,
+         journal = JI,
+         year = PY,
+         affiliation = AU_UN,
+         keywords = DE,
+         citations = TC,
+         references = NR,
+         reference.list = CR)
+
+articles %>%
+  arrange(desc(citations)) %>%
+  head(20)
+```
+
+So, where are the links to the references? Its a bit messy, they are all found in the `CRF` field, sepperated by `;`.
+
+```{r}
+articles[1, "reference.list"]
+```
+
+I will now transfere them to an article $\rightarrow$ reference edgelist. Since its a lot of data, I will here use the `data.table` package functionality. I usually avoid it, because I ahte the syntax. However, its just way faster.
+
+```{r}
+citation.el <- data.table(article = articles$article, 
+                          str_split_fixed(articles$reference.list, ";", max(articles$references, na.rm=T))) 
+
+citation.el <- melt(citation.el, id.vars = "article")[, variable:= NULL][value!=""]
+
+citation.el %<>%
+  rename(reference = value) %>%
+  arrange(article,reference)
+head(citation.el)
+```
+
+Likewise, I will transfer this into a sparse 2-mode matrix. I amke it sparse because its way more efficient.
+
+```{r}
+library(Matrix)
+mat <- spMatrix(nrow=length(unique(citation.el$article)),
+                ncol=length(unique(citation.el$reference)),
+                i = as.numeric(factor(citation.el$article)),
+                j = as.numeric(factor(citation.el$reference)),
+                x = rep(1, length(as.numeric(citation.el$article))) ) 
+row.names(mat) <- levels(factor(citation.el$article))
+colnames(mat) <- levels(factor(citation.el$reference))
+
+str(mat)
+```
+
+Here again, I use a efficient way to create the 1-mode projection. This is done by taking the matrix, and taking the dotproduct of its pransposed version (`m %*% t(m)`). For the one that still remember some matrix algebra, that will sound familiar.
+
+```{r}
+mat.art <- tcrossprod(mat)
+mat.ref <- tcrossprod(t(mat))
+rm(mat)
+```
+
+So far so good, lets put it in a graph. I also set the attributes right away.
+
+```{r}
+require(igraph)
+g <- graph_from_adjacency_matrix(mat.art, 
+                                 mode = "undirected", 
+                                 weighted = T, 
+                                 diag = F) ; rm(mat.art)
+
+g <- simplify(g, 
+              remove.multiple = T, 
+              remove.loops = T, 
+              edge.attr.comb = "sum")
+
+temp <- tibble(article = V(g)$name) %>%
+  left_join(articles %>% select(article, year, citations, references), by = "article")
+
+g <- set_vertex_attr(g, "year", value = temp$year)
+g <- set_vertex_attr(g, "citations", value = temp$citations)
+g <- set_vertex_attr(g, "references", value = temp$references)
+rm(temp)
+
+g
+```
+
+I will now do some jaccard weighting on the edges, to get a nicer distribution.
+
+```{r}
+E(g)$weight.count <- E(g)$weight
+i <- V(g)[get.edges(g, E(g))[,1]]$references # degree of node V1 of every edge
+j <- V(g)[get.edges(g, E(g))[,2]]$references # degree of node V2 of every edge
+E(g)$weight <- E(g)$weight.count / (i + j - E(g)$weight.count) 
+rm(i, j)
+```
+
+And delete the weak edges, to create more sparsity.
+
+```{r}
+g <- delete.edges(g, E(g)[weight < quantile(weight, 0.1, na.rm = T)]) 
+g <- delete.vertices(g, strength(g) == 0)
+g <- delete.vertices(g, strength(g) < quantile(strength(g), 0.25, na.rm = T) )
+g
+```
+
+La voila, we can start the analysis. However, the rest you by now know, so I will skip that for now. Instead, I will show you how to do that all way more convenient.
+
+## Fun with the [`bibliometrix`](http://www.bibliometrix.org/) package
+
+Since lately, the [`bibliometrix`](http://www.bibliometrix.org/) package became exteremly good, and by now almost suitable to replace my hand-made workflows. So, I will spare you the data munging, and demonstrate how to use the nice inbuild functionalities here. By doing so, you will develop a lot of intuition on network projection, and aggregation on different levels.
+
+```{r}
+rm(list = ls())
+require(bibliometrix)
+?bibliometrix
+```
+
+### Loading the data
+
+So, lets load some data. We could go on with my "Innovation System" data, but I have a better idea. Since it appeared appropriate, I went to Web of Science, and downloaded the most cited paper which ahve "Network Analysis" in their title, abstract. or keywords."
+
+* **Data source**:   Clarivate Analytics Web of Science (http://apps.webofknowledge.com)
+* **Data format**:   Plaintext
+* **Query**:         Topic = "Network Analysis"
+* **Timespan**:      2008-2018
+* **Document Type**: Articles
+* **Language**:      English
+* **Query data**:    October, 2018
+* **Selection**:     500 most cited
+
+We now just read the plain  data with the inbuild `convert2df()` function
+
+```{r}
+M <- convert2df(readFiles("../input/biblio/biblio_nw1.txt"), 
+                dbsource = "isi",
+                format = "plaintext")
+
+head(M)
+```
+
+### Descriptive Analysis
+
+Although bibliometrics is mainly known for quantifying the scientific production and measuring its quality and impact, it is also useful for displaying and analysing the intellectual, conceptual and social structures of research as well as their evolution and dynamical aspects. 
+
+In this way, bibliometrics aims to describe how specific disciplines, scientific domains, or research fields are structured and how they evolve over time. In other words, bibliometric methods help to map the science (so-called science mapping) and are very useful in the case of research synthesis, especially for the systematic ones.
+
+Bibliometrics is an academic science founded on a set of statistical methods, which can be used to analyze scientific big data quantitatively and their evolution over time and discover information. Network structure is often used to model the interaction among authors, papers/documents/articles, references, keywords, etc.
+
+Bibliometrix is an open-source software for automating the stages of data-analysis and data-visualization. After converting and uploading bibliographic data in R, Bibliometrix performs a descriptive analysis and different research-structure analysis.
+
+Descriptive analysis provides some snapshots about the annual research development, the top "k" productive authors, papers, countries and most relevant keywords.
+
+#### Main findings about the collection
+
+```{r}
+results <- biblioAnalysis(M)
+summary(results, 
+        k = 20, 
+        pause = F)
+plot(results)
+```
+
+#### Most Cited References (internally)
+
+```{r}
+CR <- citations(M, 
+                field = "article", 
+                sep = ";")
+cbind(CR$Cited[1:10])
+```
+
+### Bibliographic Copling Analysis: The Knowledge Frontier of the Field
+
+Bibliographic coupling is a newer technique, which has turned out to be very appropriate to capture a fields current knowledge frontier. I will show you how to do it here, but in case you are interested, read my paper :)
+
+
+```{r,fig.width=15,fig.height=15}
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "coupling", 
+                           network = "references", 
+                           sep = ";")
+
+net <-networkPlot(NetMatrix, 
+            n = 50, 
+            Title = "Bibliographic Coupling Network", 
+            type = "fruchterman", 
+            size.cex = TRUE, 
+            size = 20, 
+            remove.multiple = FALSE, 
+            labelsize = 0.7,
+            edgesize = 10, 
+            edges.min = 5)
+```
+
+### Co-citation Analysis: The Intellectual Structure and Knowledge Bases of the field 
+
+Citation analysis is one of the main classic techniques in bibliometrics. It shows the structure of a specific field through the linkages between nodes (e.g. authors, papers, journal), while the edges can be differently interpretated depending on the network type, that are namely co-citation, direct citation, bibliographic coupling. 
+
+Below there are three examples.
+
+* First, a co-citation network that shows relations between cited-reference works (nodes).
+* Second, a co-citation network that uses cited-journals as unit of analysis. The useful dimensions to comment the co-citation networks are: (i) centrality and peripherality of nodes, (ii) their proximity and distance, (iii) strength of ties, (iv) clusters, (iiv) bridging contributions.
+* Third, a historiograph is built on direct citations. It draws the intellectual linkages in a historical order. Cited works of thousands of authors contained in a collection of published scientific articles is sufficient for recostructing the historiographic structure of the field, calling out the basic works in it.
+
+
+#### Co-citation (cited references) analysis
+
+**Plot options**:
+
+* n = 50 (the funxtion plots the main 50 cited references)
+* type = "fruchterman" (the network layout is generated using the Fruchterman-Reingold Algorithm)
+* size.cex = TRUE (the size of the vertices is proportional to their degree)
+* size = 20 (the max size of vertices)
+* remove.multiple=FALSE (multiple edges are not removed)
+* labelsize = 0.7 (defines the size of vertex labels)
+* edgesize = 10 (The thickness of the edges is proportional to their strength. Edgesize defines the max value of the thickness)
+* edges.min = 5 (plots only edges with a strength greater than or equal to 5)
+* all other arguments assume the default values
+
+```{r,fig.width=15,fig.height=15}
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "co-citation", 
+                           network = "references", 
+                           sep = ";")
+
+net <-networkPlot(NetMatrix, 
+            n = 50, 
+            Title = "Co-Citation Network", 
+            type = "fruchterman", 
+            size.cex = TRUE, 
+            size = 20, 
+            remove.multiple = FALSE, 
+            labelsize = 0.7,
+            edgesize = 10, 
+            edges.min = 5)
+```
+
+#### Cited Journal (Source) co-citation analysis
+
+```{r,fig.width=15,fig.height=15}
+M <- metaTagExtraction(M, "CR_SO", sep=";")
+
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "co-citation", 
+                           network = "sources", 
+                           sep = ";")
+
+net <-networkPlot(NetMatrix, 
+            n = 50, 
+            Title = "Co-Citation Network", 
+            type = "auto", 
+            size.cex = TRUE, 
+            size = 15, 
+            remove.multiple = FALSE, 
+            labelsize = 0.7,
+            edgesize = 10, 
+            edges.min = 5)
+```
+
+by the way, the results contain an "hidden" igraph obejct. That is new, and makes further analysis of the results possible. Great!
+
+```{r}
+str(net)
+net$graph
+```
+
+Some summary statistics. I will only provide them here, but theur are availabel for all object created with `biblioNetwork()`
+
+```{r}
+netstat <- networkStat(NetMatrix)
+summary(netstat, k = 10)
+```
+
+
+#### Historiograph - Direct citation linkages
+
+We can also look at a histograph of ciation pattern over time.
+
+```{r,fig.width=15,fig.height=15}
+histResults <- histNetwork(M, 
+                           min.citations = quantile(M$TC,0.75), 
+                           sep = ";")
+
+net <- histPlot(histResults, 
+                n = 20, 
+                size.cex=TRUE, 
+                size = 5, 
+                labelsize = 3, 
+                arrowsize = 0.5)
+```
+
+
+
+### The conceptual structure and context - Co-Word Analysis
+
+Co-word networks show the conceptual structure, that uncovers links between concepts through term co-occurences.
+
+Conceptual structure is often used to understand the topics covered by scholars (so-called research front) and identify what are the most important and the most recent issues.
+
+Dividing the whole timespan in different timeslices and comparing the conceptual structures is useful to analyze the evolution of topics over time.
+
+Bibliometrix is able to analyze keywords, but also the terms in the articles' titles and abstracts. It does it using network analysis or correspondance analysis (CA) or multiple correspondance analysis (MCA). CA and MCA visualise the conceptual structure in a two-dimensional plot.
+
+We can even do way more fancy stuff with abstracts or full texts (and do so). However, I dont want to spoiler Romans sessions, so I will hold myself back here
+
+#### Co-word Analysis through Keyword co-occurrences
+
+**Plot options**:
+
+* normalize = "association" (the vertex similarities are normalized using association strength)
+* n = 50 (the function plots the main 50 cited references)
+* type = "fruchterman" (the network layout is generated using the Fruchterman-Reingold Algorithm)
+* size.cex = TRUE (the size of the vertices is proportional to their degree)
+* size = 20 (the max size of the vertices) 
+* remove.multiple=FALSE (multiple edges are not removed)
+* labelsize = 3 (defines the max size of vertex labels)
+* label.cex = TRUE (The vertex label sizes are proportional to their degree)
+* edgesize = 10 (The thickness of the edges is proportional to their strength. Edgesize defines the max value of the thickness)
+* label.n = 30 (Labels are plotted only for the main 30 vertices)
+* edges.min = 25 (plots only edges with a strength greater than or equal to 2)
+* all other arguments assume the default values
+
+```{r Keyword co-occurrences, comment=NA, fig.height=15, fig.width=15}
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "co-occurrences", 
+                           network = "keywords", 
+                           sep = ";")
+
+net <- networkPlot(NetMatrix, 
+                   normalize = "association", 
+                   n = 50, 
+                   Title = "Keyword Co-occurrences", 
+                   type = "fruchterman", 
+                   size.cex = TRUE, size = 20, remove.multiple = FALSE, 
+                   edgesize = 10, 
+                   labelsize = 3,
+                   label.cex = TRUE,
+                   label.n = 50,
+                   edges.min = 2)
+```
+
+
+#### Co-word Analysis through Correspondence Analysis
+
+You already saw that comming, right?
+
+```{r}
+CS <- conceptualStructure(M, 
+                          method = "CA", 
+                          field = "ID", 
+                          minDegree = 10, 
+                          k.max = 8, 
+                          stemming = FALSE, 
+                          labelsize = 8,
+                          documents = 20)
+```
+
+
+#### Thematic Map
+
+Co-word analysis draws clusters of keywords. They are considered as themes, whose density and centrality can be used in classifying themes and mapping in a two-dimensional diagram.
+
+Thematic map is a very intuitive plot and we can analyze themes according to the quadrant in which they are placed: (1) upper-right quadrant: motor-themes; (2) lower-right quadrant: basic themes; (3) lower-left quadrant: emerging or disappearing themes; (4) upper-left quadrant: very specialized/niche themes.
+
+Please see Cobo, M. J., López-Herrera, A. G., Herrera-Viedma, E., & Herrera, F. (2011). An approach for detecting, quantifying, and visualizing the evolution of a research field: A practical application to the fuzzy sets theory field. Journal of Informetrics, 5(1), 146-166.
+
+```{r Keyword Network}
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "co-occurrences",
+                           network = "keywords", 
+                           sep = ";")
+
+S <- normalizeSimilarity(NetMatrix, 
+                         type = "association")
+
+net <- networkPlot(S,
+                   n = 500, 
+                   Title = "Keyword co-occurrences",
+                   type = "fruchterman",
+                   labelsize = 2, 
+                   halo = FALSE,
+                   cluster = "walktrap", 
+                   remove.isolates = FALSE,
+                   remove.multiple = FALSE, 
+                   noloops = TRUE, 
+                   weighted = TRUE,
+                   label.cex = TRUE,
+                   edgesize = 5, 
+                   size = 1,
+                   edges.min = 2)
+```
+
+
+```{r ThematicMap, fig.height15, fig.width=15}
+Map <- thematicMap(net, NetMatrix, 
+                   S = S,
+                   minfreq =5 )
+plot(Map$map)
+```
+
+Lets inspect the clusters we found:
+
+```{r}
+clusters <-Map$words %>%
+  arrange(Cluster, desc(Occurrences))
+
+clusters %>%
+  select(Cluster, Words, Occurrences) %>%
+  group_by(Cluster) %>%
+  mutate(n.rel = Occurrences / sum(Occurrences) ) %>%
+  slice(1:3)
+```
+
+
+
+### The social structure - Collaboration Analysis
+
+Collaboration networks show how authors, institutions (e.g. universities or departments) and countries relate to others in a specific field of research. For example, the first figure below is a co-author network. It discovers regular study groups, hidden groups of scholars, and pivotal authors. The second figure is called "Edu collaboration network" and uncovers relevant institutions in a specific research field and their relations.
+
+#### Author collaboration network
+```{r, Au collaboration network, fig.height=15, fig.width=15}
+NetMatrix <- biblioNetwork(M %>% filter(!grepl("GESCHWIND", AU)), 
+                           analysis = "collaboration",  
+                           network = "authors", 
+                           sep = ";")
+
+S <- normalizeSimilarity(NetMatrix, type = "jaccard")
+
+net <- networkPlot(S,  
+                   n = 50, 
+                   Title = "Author collaboration",
+                   type = "auto", 
+                   size = 10,
+                   weighted = TRUE,
+                   remove.isolates = TRUE,
+                   size.cex = TRUE,
+                   edgesize = 1,
+                   labelsize = 0.6)
+```
+
+
+#### Edu collaboration network
+
+```{r, Edu collaboration network, fig.height=10, fig.width=10}
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "collaboration",  
+                           network = "universities", 
+                           sep = ";")
+
+net <- networkPlot(NetMatrix,  
+                   n = 50, 
+                   Title = "Edu collaboration",
+                   type = "auto", 
+                   size = 10,
+                   size.cex = T,
+                   edgesize = 3,
+                   labelsize = 0.6)
+```
+
+
+
+#### Country collaboration network
+
+```{r, Co collaboration network, fig.height=15, fig.width=15}
+M <- metaTagExtraction(M, 
+                       Field = "AU_CO", 
+                       sep = ";")
+
+NetMatrix <- biblioNetwork(M, 
+                           analysis = "collaboration",  
+                           network = "countries", 
+                           sep = ";")
+
+net <- networkPlot(NetMatrix,  
+                   n = dim(NetMatrix)[1], 
+                   Title = "Country collaboration",
+                   type = "sphere", 
+                   cluster = "lovain",
+                   weighted = TRUE,
+                   size = 10,
+                   size.cex = T,
+                   edgesize = 1,
+                   labelsize = 0.6)
+```
+
+Isn't that all a lot of fun? 
+
+By now you should have realized that different leevel of projection and aggregation offer almost endless possibilities for analysis of ibliographic data!
+
+
+## Your turn
+
+Finally, its again time for you to have some fun. Check out this final exercise: [here](https://www.kaggle.com/danielhain/sds-2018-m2-3-nw-exercise-1).
