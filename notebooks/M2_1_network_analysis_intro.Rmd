@@ -1,5 +1,5 @@
 ---
-title: 'M2-1: Introduction to Network Analysis'
+title: 'M2-1: Introduction to Network Analysis (Part I)'
 author: "Daniel S. Hain (dsh@business.aau.dk)"
 date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -29,8 +29,8 @@ knitr::opts_chunk$set(warning=FALSE,
 
 ### Install packages if necessary
 if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
-pacman::p_load(tidyverse, # Standard datasciewnce toolkid
-               magrittr, # For advanced piping (%>%)
+pacman::p_load(tidyverse, # Standard datasciewnce toolkid (dplyr, ggplot2 et al.)
+               magrittr, # For advanced piping (%>% et al.)
                igraph, # For network analysis
                tidygraph, # For tidy-style graph manipulation
                ggraph, # For ggplot2 style graph plotting
@@ -38,17 +38,26 @@ pacman::p_load(tidyverse, # Standard datasciewnce toolkid
                )
 ```
 
+Welcome to your introduction to network analysis. In this session you will learn:
+
+1. Why applying network analysis is helpful to answer certain questions, and why framing certain contexts as networks gives new insights.
+2. The basic structure of relational data.
+3. How to construct graph objects from different datasources.
+4. How to analyse basic features of nodes, edges, and graphs.
+5. How to identify groups and communities in graphs.
+6. How to do simple network visualizations.
+
 # Introduction
 
+## So what?
 So, before we talk about networks, one thing upfront... why should we? I mean, they undeniably look pretty, don't they? Somehow, the visualization of networks fascinates the human mind (find a short TED talk on networks and how they depict our world [here](https://www.ted.com/talks/manuel_lima_a_visual_history_of_human_knowledge)), and has even inspired an own art movement, networkism (see some examples [here](https://www.behance.net/gallery/184045/Links)). 
 
 Yet, besides that, is there an analytical value for a data scientist to bother about networks?
 
 ![](https://www.dropbox.com/s/b8x2iwhaxacheem/networks_google_apple.png?dl=1){width=750px}
 
-# The Basic Structure of Networks
+## The basic jargon
 
-## The Basic Jargon
 First of all, what is a network? Plainly speaking, a network is a **system** of **elements** which are connected by some **relationship**. The vocabulary can be a bit technical and even inconsistent between different disciplines, packages, and software. 
 
 The whole system is (surprise, surprise) usually called a **network** or **graph**. The elements are commonly referred to as **nodes** (system theory jargon) or **vertices** (graph theory jargon) of a graph, while the connections are **edges** or **links**. I will mostly refer to the elements as nodes, and their connections as edges.
@@ -78,9 +87,10 @@ The possibilities to depict relational data are manifold. For example:
      * Buy from / sell to, leases to, outsources to
      * Owns shares of, subsidiary of
      * Via their members (Personnel flows, friendship...)
+     
+## Why it is useful?
 
-# The Data-Structure of Relational Data
-
+# Relational data-structures
 
 ## Edgelist
 Most real world relational data is to be found in what we call an **edge list**, a dataframe that contains a minimum of two columns, one column of *nodes* that are the source of a connection and another column of nodes that are the target of the connection. The nodes in the data are identified by unique IDs.
@@ -226,7 +236,7 @@ V(g)$name
 
 There is obviously a lot more to say about `igraph` and its rich functionality. You will learn much of the abse functionality of `igraph` in your DC assignments. Furthermore [Katya Ognyanova](https://kateto.net/), has a [brilliant tutorial](https://kateto.net/networks-r-igraph) that can be studied.
 
-## Graph objects in [`tidygraph`](https://github.com/thomasp85/tidygraph)
+### Graph objects in [`tidygraph`](https://github.com/thomasp85/tidygraph)
 While the `igraph` functionality still represents the core of `R`'s network analysis toolbox, recent developments have made network analytics much more accessible and intuitive.
 
 [Thomas Lin Pedersen](http://www.data-imaginist.com) (also known as the developer of beloved packages like `ggforce`, `gganimate`, and the `R` implementation of `lime`)  has recently released the [`tidygraph`](https://github.com/thomasp85/tidygraph) package that leverage the power of `igraph` in a manner consistent with the [`tidyverse`](http://www.tidyverse.org) workflow. It represents a lightweight wrapper around the core `igraph` object and functionality which makes it accessible for much of the traditional `dplyr` workflows. Even better, he tops it up with [`ggraph`](https://cran.r-project.org/web/packages/ggraph/index.html), a consistent `ggplot2`-look-and-feel network visualization package.
@@ -447,7 +457,8 @@ g %>%
 
 ## Network level measures
 
-
+## Your turn
+Please do **Exercise 1** in the corresponding section on `Github`.
 
 
 # Case: Networks are coming...
@@ -627,6 +638,9 @@ g %E>%
     labs(title = "A Song of Ice and Fire character network",
          subtitle = "Nodes are colored by community")
 ```        
+
+## Your turn
+Please do **Exercise 2** in the corresponding section on `Github`.
 
 # More info
 You can find more info about:
