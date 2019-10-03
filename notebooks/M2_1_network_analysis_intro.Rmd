@@ -40,7 +40,6 @@ pacman::p_load(tidyverse, # Standard datasciewnce toolkid
 
 # Introduction
 
-## Networks... So what?
 So, before we talk about networks, one thing upfront... why should we? I mean, they undeniably look pretty, don't they? Somehow, the visualization of networks fascinates the human mind (find a short TED talk on networks and how they depict our world [here](https://www.ted.com/talks/manuel_lima_a_visual_history_of_human_knowledge)), and has even inspired an own art movement, networkism (see some examples [here](https://www.behance.net/gallery/184045/Links)). 
 
 Yet, besides that, is there an analytical value for a data scientist to bother about networks?
@@ -524,6 +523,41 @@ g <- g %E>%
   filter(!node_is_isolated()) 
 ```
 
+Note that the edges in this graph are weighted. We can briefly look at the weight distribution:
+
+```{r}
+g %E>%
+  as_tibble() %>%
+  ggplot(aes(x = weight)) +
+  geom_histogram()
+```
+
+We see a right skewed distribution with many weak and some very strong edges. Lets take a look what are the edges with the highest weight (meaning here: the characters with most intraction).
+
+```{r}
+g %E>%
+  as_tibble() %>%
+  arrange(desc(weight)) %>%
+  head()
+```
+
+`tidygraph` always uses numeric IDs for nodes, which are also labeling the edges. This is not very helpful to get insights. So, lets take the node names in instead.
+
+```{r}
+# We access the nodes directly via .N(). The same can be done for edges with .E() and the graph with .G(). Check ?context_accessors for more infos
+g %E>%
+  mutate(name_from = .N()$name[from],
+         name_to = .N()$name[to]) %>%
+  as_tibble() %>%
+  select(name_from, name_to, weight) %>%
+  arrange(desc(weight)) %>%
+  head()
+```
+
+
+
+
+## Node Characteristics
 
 ```{r}
 g <- g %N>%
