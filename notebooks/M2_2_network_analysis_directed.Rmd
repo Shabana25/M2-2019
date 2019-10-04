@@ -51,12 +51,16 @@ Hello so far :)
 
 # Directed networks
 
-Today we will talk about
+Up to now, we did not pay attention to the direction of edges, and assumed them to be symetric (`A->B == B->A`). this makes sense in a lot of setting, for instance when we look at co-occurence networks. However, in many cases, such as friendship networks, that might not be the case (the person you name a close friend not necessarily thinks the same about you). In such cases, we would like to take this directionality into account, and analyse **directed networks**. 
+
+Lets look a brief example of highschool students data, which had to name their close friends.
 
 ```{r}
 highschool %>%
   head()
 ```
+
+Again, here it sometimes happens that friendship is not reciprocal, so we will create a directed friendship graph.
 
 ```{r}
 g <- highschool %>% 
@@ -65,12 +69,15 @@ g
 ```
 
 ```{r}
+# The names where anonymized, which is a bit boring. So I will just give them some random names to associate with.
 p_load(randomNames)
 
 g <- g %N>%
   mutate(gender = rbinom(n = n(), size = 1, prob = 0.5),
          label= randomNames(gender = gender, name.order = "first.last"))
 ```
+
+Lets plot this network briefly to get a sense. Notice that we have edges for two years, so we can do a facet plot for every year.
 
 ```{r}
 g %E>% 
@@ -81,6 +88,8 @@ g %E>%
     facet_edges(~year)
 ```
 
+We indeed see that the friendship structure alters slightly between years. To make it less complicated for now, we will only look at the 1958 network.
+
 ```{r}
 g <- g %E>% 
   filter(year == 1958) %N>%
@@ -88,6 +97,13 @@ g <- g %E>%
 ```
 
 ## Centrality measures
+
+Our network is now directed, meaning a node-pair now has two different roles:
+
+* **Ego:** The node the edge loriginates from.
+* **Alter:** The node the edge leads to.
+
+Consequently, most network metrics have to take this directionality into account. For example, degree centrality is now differentiated between the **in-degree** centrality (now many edges lead to the node) and the **out-degree** centrality (now many edges lead to the node)
 
 ```{r}
 g <- g %N>%
