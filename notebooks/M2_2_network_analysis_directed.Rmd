@@ -40,11 +40,18 @@ pacman::p_load(tidyverse, # Standard datasciewnce toolkid (dplyr, ggplot2 et al.
 
 Welcome to your second part of the introduction to network analysis. In this session you will learn:
 
-1. xxx
+1. What directed networks are, and when that matters.
+2. How different measures have to be calculated in directed networks.
+3. What multidimensional networks are, and how they matter.
+4. How to compare network measures between graphs, and with random graphs
 
 # Introduction
 
+Hello so far :) 
+
 # Directed networks
+
+Today we will talk about
 
 ```{r}
 highschool %>%
@@ -77,7 +84,7 @@ g %E>%
 ```{r}
 g <- g %E>% 
   filter(year == 1958) %N>%
-  filter(!node_is_isolated())
+  filter(!node_is_isolated()) 
 ```
 
 ## Centrality measures
@@ -90,6 +97,24 @@ g <- g %N>%
 
 ## Community Structures
 
+Now it is getting a bit more complicated. Most community detection algorithms implemented in `igraph` only work with undirected networks. So, now we could do 2 things:
+
+1. Convert the network in an undirected one.
+2. Use the "edge betweenness" algorithm, the only one implementedthat can handle directed networks.
+
+```{r}
+g <- g %N>%
+  mutate(community = group_edge_betweenness(directed = TRUE) %>% as.factor())
+```
+
+```{r}
+g %E>% 
+  ggraph(layout = "nicely") + 
+    geom_edge_link(arrow = arrow()) + 
+    geom_node_point(aes(col = community, size = cent_dgr_in)) +
+    theme_graph() 
+```
+
 
 
 
@@ -97,7 +122,7 @@ g <- g %N>%
 
 ## Introduction to the case
 
-Emmanuel Lazega, The Collegial Phenomenon: The Social Mechanisms of Cooperation Among Peers in a Corporate Law Partnership, Oxford University Press (2001).
+* Emmanuel Lazega, The Collegial Phenomenon: The Social Mechanisms of Cooperation Among Peers in a Corporate Law Partnership, Oxford University Press (2001).
 
 ### Data 
 This data set comes from a network study of corporate law partnership that was carried out in a Northeastern US corporate law firm, referred to as SG&R, 1988-1991 in New England. It includes (among others) measurements of networks among the 71 attorneys (partners and associates) of this firm, i.e. their strong-coworker network, advice network, friendship network, and indirect control networks. Various members' attributes are also part of the dataset, including seniority, formal status, office in which they work, gender, lawschool attended, individual performance measurements (hours worked, fees brought in), attitudes concerning various management policy options, etc. This dataset was used to identify social processes such as bounded solidarity, lateral control, quality control, knowledge sharing, balancing powers, regulation, etc. among peers.
@@ -183,6 +208,8 @@ nodes %>% head()
 
 ### Generate the graph
 
+Since we have now a **multidimensional** network (=different types of edges), we first load them into isolated networks.
+
 ```{r}
 g_friendship <- mat_friendship %>% as_tbl_graph(directed = TRUE) %E>%
   mutate(type = "friendship") %N>%
@@ -201,6 +228,27 @@ g_work <- mat_work %>% as_tbl_graph(directed = TRUE) %E>%
 
 # Notice: The node names are taken from the matrices dimnames as string, therefore need to be converted as numeric
 ```
+
+### Calculate dimensional centralities
+
+There might be better ways to do that (still experimenting), but for now lets first create centralities upfront for all networks. We for now only look at the in-degree.
+
+```{r}
+g_friendship <- g_friendship %N>%
+  mutate(centrality_dgr_in_friendship = centrality_degree(mode = "in")) 
+
+g_advice <- g_advice %N>%
+  mutate(centrality_dgr_in_advice = centrality_degree(mode = "in")) 
+
+g_work <- g_work %N>%
+  mutate(centrality_dgr_in_work = centrality_degree(mode = "in")) 
+```
+
+
+### Join the networks
+
+
+
 
 ```{r}
 g <- g_friendship %>%
@@ -257,11 +305,9 @@ mean_distance(g, directed = TRUE)
 # Transistivity
 transitivity(g, type ="global")
 
-# recipricity
+# reciprocity
 reciprocity(g)
 ```
-
-The last two ones make even mores sense in social networks, don't they?
 
 We have another important concept that often explains edge-formation: **Assortativity**, anso called **homopholy**. This is a measure of how preferentially attached vertices are to other vertices with identical attributes. In other words: How much "*birds of the same feather flock together *".
 
@@ -290,11 +336,11 @@ One more thing we didn't talk about yet: Small worlds.
 
 Small worlds are an interesting network structure, combining short path lenght betwen the nodes with a high clustering coefficient. That means, that we have small interconected clusters, which are in turn connected by **gatekeepers** (the edges we call **bridges** or **structural holes**). 
 
-![](../media/M2_1_smallworld2.jpg){width=500px}
+![](https://www.dropbox.com/s/q8n36748aodif8p/networks_smallworld2.jpg?dl=2){width=500px}
 
 This leads to an interesting setup, which has proven to be conductive for efficient communication and fast diffusion of information in social networks.
 
-![](../media/M2_1_smallworld1.jpg){width=500px}
+![](https://www.dropbox.com/s/43h8tl2ynbc784a/networks_smallworld1.jpg?dl=1){width=500px}
 
 We calculate it for now in an easy way:
 
@@ -312,7 +358,6 @@ g.r <- erdos.renyi.game(n = gorder(g),
                         type = "gnm",
                         directed = TRUE,
                         loops = FALSE)
-plot(g.r)
 ```
 
 Looks kind of different. However, one randomly created network doesn't present a good abseline. So, lets better create a bunch, and compare our network to the average values of the randomly generated ones.
@@ -360,13 +405,19 @@ stats.friend
 ## Your turn
 Please do **Exercise 1** in the corresponding section on `Github`.
 
-# More info
+# Endnotes
+
+### References
+
+### More info
 You can find more info about:
 
-* tidygraph [here](https://www.data-imaginist.com/2017/introducing-tidygraph/)
-* ggraph [here](https://www.data-imaginist.com/2017/announcing-ggraph/)
+* `tidygraph` [here](https://www.data-imaginist.com/2017/introducing-tidygraph/)
+* all `tidygraph` functions [here](https://rdrr.io/cran/tidygraph/man/)
+* `ggraph` [here](https://www.data-imaginist.com/2017/announcing-ggraph/)
 
 
+### Session info
 ```{r}
 sessionInfo()
 ```
