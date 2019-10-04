@@ -63,13 +63,14 @@ First of all, what is a network? Plainly speaking, a network is a **system** of 
 The whole system is (surprise, surprise) usually called a **network** or **graph**. The elements are commonly referred to as **nodes** (system theory jargon) or **vertices** (graph theory jargon) of a graph, while the connections are **edges** or **links**. I will mostly refer to the elements as nodes, and their connections as edges.
 
 ```{r, echo=FALSE}
+# If you see this code, dont worry about it. Its just to create the visual
 tibble(from = c(1,2,3,1), to = c(3,1,5,5), text = rep("Edge", 4)) %>% 
   as_tbl_graph() %N>%
   mutate(text = "Node") %>%
   ggraph(layout = "nicely") +
   geom_node_point(size = 10, col = "skyblue") + 
   geom_node_text(aes(label = name)) +
-  geom_edge_link(aes(label = text, alpha = 0.5)) +
+  geom_edge_link(aes(label = text, alpha = 0.5, show.legend = FALSE)) +
   theme_graph() +
   labs(title = "What is a network?", subtitle = "A system of elements (nodes/vertices) and connections (edges) between them") +
   geom_mark_ellipse(aes(x, y, label = "Node / Vertex", 
@@ -101,7 +102,6 @@ The possibilities to depict relational data are manifold. For example:
      * Owns shares of, subsidiary of
      * Via their members (Personnel flows, friendship...)
      
-## Why it is useful?
 
 # Relational data-structures
 
@@ -135,7 +135,7 @@ adj_matrix <- edge_list %>%
 adj_matrix
 ```
 
-Note: Existing as well as not existing connections are stored. Since most networks in reality are **sparse** (= more potential connections are inactive than active), this is inneficient for storrage and computation. Here, a `dgCMatrix` object from the `Matrix`can be helpful.
+*Note:* Existing as well as not existing connections are stored. Since most networks in reality are **sparse** (= more potential connections are inactive than active), this is inneficient for storrage and computation. Here, a `dgCMatrix` object from the `Matrix`can be helpful.
 
 ```{r}
 library(Matrix)
@@ -210,11 +210,13 @@ g[[1:2]]%>% glimpse() # Note the double brackets (g is a list object)
 
 We see, the object has a list-format, consisting of sepperate lists for every node, containing some attributes which are irrelevant now, and an edgelist for every node, capturing its ego-network (eg., `..$ Jesper: 'igraph.vs' Named int [1:3] 2 4 5`)
 
-We can also plot it to take a look. `igraph` object can be directly used with the `plot()` function. The results can be adjusted with a set of parameters we will discover later. It's not super pretty, therefore we will later also explore more powerfull plotting tools for rgaphs. However, its quick&dirty, so lets take it like that for now.
+We can also plot it to take a look. `igraph` object can be directly used with the `plot()` function. The results can be adjusted with a set of parameters we will discover later. It's not super pretty, therefore we will later also explore more powerfull plotting tools for gaphs. However, its quick&dirty, so lets take it like that for now. 
 
 ```{r}
 plot(g)
 ```
+
+*Note:* We will not venture further into the `igraph` plotting functionality, since we will go all in with `ggraph`. However, there is a very neath tutorial [here](https://raw.githack.com/kateto/R-Network-Visualization-Workshop/master/Sunbelt%202019%20R%20Network%20Visualization%20Workshop.html), that will tell you everything you need to know, in case you are interested.
 
 We can inspect and manipulate the nodes via `V(g)` (V for vertices, its graph-theory slang), and edges with `E(g)`
 
@@ -283,8 +285,8 @@ In adittionan, the `as_tbl_graph()` function also can transform different types 
 ### Acessing and manipulating nodes and edges
 But how can a graph object be manipulated with `dplyr` syntax? We know that a graph object contains an edge as well as node dataframe, so commands like `g %>% filter(name == "Pernille")` would be confusing, since it is unclear if we refer to nodes or edges. `tidygraph`'s solution here are selective **activation pipes**:
 
-* `%N>%` activates nodes
-* `%E>%` activates edges
+* `%N>%` activates nodes (short for longer alternative:`%>% activate_nodes()`)
+* `%E>%` activates edges (short for longer alternative:`%>% activate_edges()`)
 
 Consequently, functions are executed on the currently active dataframe of either nodes or edges. With this simple syntax trick, graphs become subject to most commonly known data manipulation workflows for tabular data.
 
@@ -311,16 +313,12 @@ g %N>%
   as_tibble()
 ```
 
-### MAnipulating graphs
-
-XXXX MErging etc
-
 
 ### Visualization (preview)
 
 One last thing for now: While `igraph` also provides a powerful network visualization functionality, I will also mostly go with Thomas sister package, [`ggraph`](https://github.com/thomasp85/ggraph), which provides a network visualization interface compatible and consistent with `ggplot2`
 
-The rest works like any ggplot2 function call, just that we use special geoms for our network, like geom_edge_density() to draw a shadow where the edge density is higher, geom_edge_link() to connect edges with a straight line, geom_node_point() to draw node points and geom_node_text() to draw the labels. More options can be found here.
+The rest works like any `ggplot` function call, just that we use special geoms for our network, like `geom_edge_density()` to draw a shadow where the edge density is higher, `geom_edge_link()` to connect edges with a straight line, `geom_node_point()` to draw node points and `geom_node_text()` to draw the labels. More options can be found here.
 
 ```{r}
 library(ggraph)
@@ -330,7 +328,7 @@ g %>% ggraph(layout = "nicely") +
   geom_node_text(aes(label = name))
 ```
 
-Not very impressive up to now, but wait for the real stuff to come...
+Not very impressive up to now, but wait for the real stuff to come in later sessions.
 
 # Network analysis and measures
 While being able to use the `dplyr` verbs on relational data is nice and all, one of the reasons we are dealing with graph data in the first place is because we need some *graph-based algorithms* for solving our problem at hand. If we need to break out of the tidy workflow every time this was needed we wouldn’t have gained much. Because of this `tidygraph` has wrapped more or less all of `igraphs` algorithms in different ways, ensuring a consistent syntax as well as output that fits into the tidy workflow. In the following we’re going to take a look at these.
@@ -433,11 +431,15 @@ g %>%
 ```
 
 
-### Clustering (Community detection)
+## Clustering (Community detection)
 
 Another common operation is to group nodes based on the graph topology, sometimes referred to as *community detection* based on its commonality in social network analysis.
 
 All clustering algorithms from `igraph` are available in tidygraph using the `group_*` prefix. All of these functions return an integer vector with nodes (or edges) sharing the same integer being grouped together.
+
+There are-just like for clusterin of tabular data in UML-many different algorithms and approaches to 
+
+Lets illustrate 
 
 ```{r}
 # We create an example network
@@ -474,11 +476,78 @@ g %>%
     theme_graph()
 ```
 
+## Neighborhood of a Node
 
-## Network level measures
+Lastly, we can look at the surrounding of a node, meaning the ones it is connected to, its **neighborhood**. Here, we can look at the **ego-network of a node**. That means how many nodes are in a certain **geodesic distance**. Plainly speaking, how many nodes are not more than x-steps away.
 
-## Your turn
-Please do **Exercise 1** in the corresponding section on `Github`.
+![](https://www.dropbox.com/s/yat7qsdfszmc1d1/networks_distance.jpg?dl=1){width=250px}
+
+Lets check the size of all nodes neighborhood at distance 2.
+
+```{r}
+g %N>%
+  mutate(neighborhood_size = local_size(order = 2)) %>%
+  as_tibble() %>%
+  arrange(desc(neighborhood_size)) %>%
+  head()
+```
+
+We can also not only look at it, but produce a new sub-graph only of this ego-network. Here, we need to use the base `igraph` function. Note that it produces an `igraph` object, so we have to make a `tidygraph` again...
+
+```{r}
+g1 <- make_ego_graph(g, 2, nodes = 1)[[1]] %>% as_tbl_graph()
+g50 <- make_ego_graph(g, 2, nodes = 50)[[1]] %>% as_tbl_graph()
+```
+
+```{r}
+g1 %>% 
+    ggraph(layout = 'kk') + 
+    geom_edge_link() + 
+    geom_node_point(aes(colour = community), size = 7) + 
+    theme_graph()
+```
+
+```{r}
+g50 %>% 
+    ggraph(layout = 'kk') + 
+    geom_edge_link() + 
+    geom_node_point(aes(colour = community), size = 7) + 
+    theme_graph()
+```
+
+
+## (Global) Network structure
+
+Finally, it is often also informative to look at the overal characteristics of the network. We will do this in more detail enxt time, but just so you know:
+
+
+The **density** of a measure represents the share of all connected to all possible connections in the network
+
+```{r}
+edge_density(g)
+```
+
+**Transistivity**, also called the **Clustering Cefficient** indicates how much the network tends to be locally clustered. That is measured by the share of **closed triplets**. Again,w e will dig into that next time.
+
+![](https://www.dropbox.com/s/ei585dd6ysa243d/networks_ccoeff.png?dl=1){width=250px}
+
+
+```{r}
+transitivity(g)
+```
+
+
+The **diameter** is the longest of the shortest paths between two nodes of the network.
+
+```{r}
+diameter(g, directed = F, weights = NA)
+```
+
+Finally, the **mean distance**, or **average path lenght** represents the mean of all shortest paths between all nodes. It is a measure of diffusion potential within a network.
+
+```{r}
+mean_distance(g, directed = F)
+```
 
 
 # Case: Networks are coming...
@@ -526,7 +595,7 @@ chars_main <- edges %>%
 head(chars_main)
 ```
 
-So far so good, if we only go by edge weights, Seems as if Tyrion might make it.... my favorite anyhow. Lets reduce our edgelist to this main characters, just to warm up and keep the overview.
+So far so good, if we only go by edge weights, Lets reduce our edgelist to this main characters, just to warm up and keep the overview.
 
 ```{r}
 edges %<>%
@@ -586,8 +655,6 @@ g %E>%
 ```
 
 
-
-
 ## Node Characteristics
 
 ```{r}
@@ -636,6 +703,7 @@ g %N>%
 
 ## Network Visualization I
 
+Ok, lets give it a first minimal shot:
 
 ```{r}
 g %>% ggraph(layout = "fr") + 
@@ -644,6 +712,7 @@ g %>% ggraph(layout = "fr") +
   geom_node_text(aes(label = name)) 
 ```
 
+Not very exciting. Maybe we can do a bit better, using more options in the `ggraph` functionality to visualize aspects of the network.
 
 ```{r, fig.height=15, fig.width=20}
 g %E>% 
@@ -660,13 +729,13 @@ g %E>%
 ```        
 
 ## Your turn
-Please do **Exercise 2** in the corresponding section on `Github`.
+Please do **Exercise 1** in the corresponding section on `Github`.
 
 # More info
 You can find more info about:
 
-* tidygraph here
-* ggraph here
+* tidygraph [here](https://www.data-imaginist.com/2017/introducing-tidygraph/)
+* ggraph [here](https://www.data-imaginist.com/2017/announcing-ggraph/)
 * A Datacamp Python project for the same data set [here](https://www.datacamp.com/projects/76?utm_campaign=broadcast&utm_medium=broadcast_8&utm_source=main)
 
 ```{r}
