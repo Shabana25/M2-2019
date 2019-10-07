@@ -1,6 +1,6 @@
 # SDS Autumn 2019, M2, Assignment 1
 Daniel S. Hain (<dsh@business.aau.dk>) & Roman Jurowetzki (<roman@business.aau.dk>)
-07/10/2018
+07/10/2019
 
 # Introduction
 
