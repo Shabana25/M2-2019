@@ -1,6 +1,6 @@
 # SDS Autumn 2019, M2, Assignment 1
 Daniel S. Hain (<dsh@business.aau.dk>) & Roman Jurowetzki (<roman@business.aau.dk>)
-07/10/2019
+08/10/2019
 
 # Introduction
 
@@ -55,7 +55,7 @@ Find the overal network level of..
 * Transistivity (Clustering Coefficient)
 * Reciprocity
 
-... for the different networks. Interpret the results. Answer questions such as: Are relationships like friendship and advice giving usually reciprocal? Are friends of your friends also your friends?
+... for the different networks. Interpret the results. Answer the following questions: Are relationships like friendship and advice giving usually reciprocal? Are friends of your friends also your friends?
 
 ### Node level characteristics
 
@@ -76,7 +76,7 @@ Everything goes. Show us some pretty and informative plots. Choose what to plot,
 
 # Deliverables
 
-Please submit a PDF or HTML version of your notebook on peergrade.io. In adittion, include a link to a functioning goocle colab notebook included. Please make sure(eg. own test in “anonymous” setting in your browser) that otherscan acess it.
+Please submit a PDF or HTML version of your notebook on peergrade.io (if you submit HTML, please zip it before - large embedded HTMLs from cause crashing when oppened directly in peergrade). In adittion, include a link to a functioning google colab notebook. Please make sure (i.e. own test in “anonymous” setting in your browser) that others can access it.
 
 This notebook should:
 
@@ -85,16 +85,11 @@ This notebook should:
 
 # Further process and dates
 
-* You will receive an upload link on peergrade.io by XX.10.209 morning with concrete instructions.
+* You will receive an upload link on peergrade.io by .10.209 morning with concrete instructions.
 * The notebook upload is also due 10.10.2018, 11:55pm. Delays are not accepted.
 * On latest 11.10.2018, you will recieve an invitation to peergrade your fellows exams on peergrade.io. You will be asked for the evaluation of 3 peer-assignments is part of the assignment and mandatory.
-* The peergrade evaluation is due XX.10.2019, 11:55pm. Delays are not accepted.
+* The peergrade evaluation is due 16.10.2019, 11:55pm. Delays are not accepted!
 
-# Evaluation
-
-* Supervised peer-evaluation.
-* Evaluation by 3 peer-reviewers
-*
 
 # Hints
 
