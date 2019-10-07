@@ -14,3 +14,32 @@ SDS Module 2: Working with Relational and Language Data
 * Exercises
 
     * Exercise 1: Directed networks basics [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/exercises/M2_2_network_analysis_directed_ex1.ipynb#offline=true&sandboxMode=true)
+
+
+
+
+
+
+
+# Further Resources
+
+## Asignments
+* [Assignment 1](XXXXXXXXX)
+
+    
+## Tutorials & Knowledge
+
+### Network Analysis
+
+#### General
+
+* [Awesome Network Analysis Resource Collection](https://github.com/briatte/awesome-network-analysis)
+
+#### Network Analysis in R
+
+#### Network Analysis in Python
+
+
+
+## Tools & Notebooks
+* X
