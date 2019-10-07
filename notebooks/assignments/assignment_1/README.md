@@ -4,7 +4,7 @@ Daniel S. Hain (<dsh@business.aau.dk>) & Roman Jurowetzki (<roman@business.aau.d
 
 # Introduction
 
-In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2018/tree/master/assignments/assignment_1/data)
+In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2019/tree/master/notebooks/assignments/assignment_1/data)
 # Data: What do I get?
 
 ## Background
@@ -19,13 +19,15 @@ The company manufactured high-tech equipment on the west coast of the United Sta
 
 The dataset includes 4 files - 3xKrack-High-Tec and 1x High-Tec-Attributes.
 
-Krack-High-Tec includes the following three 21x21 matrices: 
+**Krack-High-Tec** includes the following three 21x21 text matrices: 
 
 * ADVICE non-symmetric, binary
 * FRIENDSHIP non-symmetric, binary
 * REPORTS_TO non-symmetric, binary
 
-High-Tec-Attributes includes one 21x4 valued matrix.
+Column 1 contains the ID of the **ego** (from wehere the edge starts), and column 3 the **alter** (to which the edge goes). Column 3 indicates the presence (=1) or absence (=0) of an edge.
+
+**High-Tec-Attributes** includes one 21x4 valued matrix.
 
 * ID: Numeric ID of the manager
 * AGE: The managers age (in years)
@@ -35,7 +37,7 @@ High-Tec-Attributes includes one 21x4 valued matrix.
 
 # Instructions: What shall I do?
 
-## Create a network
+## 1. Create a network
 
 * Generate network objects for the companies organizational structure (reports to), friendship, advice
 * This networks are generated from the corresponding edgelists
@@ -74,26 +76,34 @@ Everything goes. Show us some pretty and informative plots. Choose what to plot,
 
 # Deliverables
 
-You are asked to deliver a Computational Notebook (R Markdown, R Notebook, or Jupyter Notebook in Python or R, the language is your choice) which answers the above-stated questions. It should have the following characteristics.
+Please submit a PDF or HTML version of your notebook on peergrade.io. In adittion, include a link to a functioning goocle colab notebook included. Please make sure(eg. own test in “anonymous” setting in your browser) that otherscan acess it.
 
-* It should be able to run on every other computer, given it is placed in the same folder as the data. Take for granted that (as it should be for all your fellows), `R` and `Python` (Anaconda distribgution) is installed.
-* This should be possible solely by running the contained code chunk-by-chunk. A good way to test compatibility (this is not always working, unfortunately) is to run the notebook in free hosted environments (Google Colab, kaggle, Azure Notebooks).
-* If you use specific libraries (outside what we used in class) please write a note at the start of the notebook explaining what has to be installed.
+This notebook should:
+
 * It should solve the questions in an straightforward and elegant way.
 * It should contain enough explanations to enable your fellow students (or others on a similar level of knowledge) to clearly understand what you are doing, why, what is the outcome, how to interpret it, and how to reconstruct the exercise. Be specific and understandable, but brief.
 
 # Further process and dates
 
-* You will receive an upload link on peergrade.io by 10.10.2018 morning with concrete instructions.
+* You will receive an upload link on peergrade.io by XX.10.209 morning with concrete instructions.
 * The notebook upload is also due 10.10.2018, 11:55pm. Delays are not accepted.
 * On latest 11.10.2018, you will recieve an invitation to peergrade your fellows exams on peergrade.io. You will be asked for the evaluation of 3 peer-assignments is part of the assignment and mandatory.
-* The peergrade evaluation is due 22.10.2018, 11:55pm. Delays are not accepted.
+* The peergrade evaluation is due XX.10.2019, 11:55pm. Delays are not accepted.
 
 # Evaluation
 
 * Supervised peer-evaluation.
 * Evaluation by 3 peer-reviewers
+*
 
 # Hints
 
+General
+
 * Keep in mind, you are looking in all cases at directed and unweighted networks.
+
+R 
+
+* Use `fread` from the `data.table` package to conveniently read the files
+
+
