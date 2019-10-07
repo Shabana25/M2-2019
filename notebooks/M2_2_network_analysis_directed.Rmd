@@ -428,9 +428,8 @@ Please do **Exercise 1** in the corresponding section on `Github`.
 ### More info
 You can find more info about:
 
-* `tidygraph` [here](https://www.data-imaginist.com/2017/introducing-tidygraph/)
-* all `tidygraph` functions [here](https://rdrr.io/cran/tidygraph/man/)
-* `ggraph` [here](https://www.data-imaginist.com/2017/announcing-ggraph/)
+* `tidygraph` [here](https://tidygraph.data-imaginist.com/)
+* `ggraph` [here](https://ggraph.data-imaginist.com/)
 
 
 ### Session info
