@@ -39,7 +39,3 @@ SDS Module 2: Working with Relational and Language Data
 
 #### Network Analysis in Python
 
-
-
-## Tools & Notebooks
-* X
