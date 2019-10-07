@@ -49,7 +49,7 @@ Make a little analysis on:
 
 ### Network level characteristics
 
-Find the overal network level of..
+Find the overal network level of:
 
 * Density
 * Transistivity (Clustering Coefficient)
@@ -85,9 +85,9 @@ This notebook should:
 
 # Further process and dates
 
-* You will receive an upload link on peergrade.io by .10.209 morning with concrete instructions.
-* The notebook upload is also due 10.10.2018, 11:55pm. Delays are not accepted.
-* On latest 11.10.2018, you will recieve an invitation to peergrade your fellows exams on peergrade.io. You will be asked for the evaluation of 3 peer-assignments is part of the assignment and mandatory.
+* You will receive an upload link on peergrade.io by 09.10.209 morning with concrete instructions.
+* The notebook upload is also due 11.10.2018, 11:55pm. Delays are not accepted.
+* After the upload deadline, you will recieve an invitation to peergrade your fellows' exams on peergrade.io. You will be asked for the evaluation of 3 peer-assignments is part of the assignment and mandatory.
 * The peergrade evaluation is due 16.10.2019, 11:55pm. Delays are not accepted!
 
 
