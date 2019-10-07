@@ -1,10 +1,10 @@
-# SDS Autumn 2018, M2, Assignment 1
+# SDS Autumn 2019, M2, Assignment 1
 Daniel S. Hain (<dsh@business.aau.dk>) & Roman Jurowetzki (<roman@business.aau.dk>)
-05/10/2018
+07/10/2018
 
 # Introduction
 
-In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2018/tree/master/assignments/assignment_1/data), while starter code again awaits you [HERE](https://github.com/SDS-AAU/M2-2018/tree/master/assignments/assignment_1/starter_code). Good luck!
+In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2018/tree/master/assignments/assignment_1/data)
 # Data: What do I get?
 
 ## Background
