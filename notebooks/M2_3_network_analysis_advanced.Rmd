@@ -492,6 +492,21 @@ While that sounds simple, it can be a very powerful technique, as I will demonst
 #data %>% head()
 ```
 
+```{r}
+g <- create_bipartite(20, 5, directed = FALSE, mode = "out")
+```
+
+```{r}
+g
+```
+
+
+```{r}
+g %>% ggraph("bipartite") + 
+  geom_edge_link() + 
+  theme_graph()
+```
+
 
 # Case study: Bibliographic networks
 
@@ -837,24 +852,6 @@ net$graph %>% as_tbl_graph()
 ```
 
 
-#### Historiograph - Direct citation linkages
-
-We can also look at a histograph of ciation pattern over time.
-
-```{r}
-histResults <- histNetwork(M, 
-                           min.citations = quantile(M$TC,0.75, na.rm = TRUE), 
-                           sep = ";")
-```
-
-```{r,fig.width=15,fig.height=15}
-net <- histPlot(histResults, 
-                n = 20, 
-                size = 5, 
-                labelsize = 3)
-```
-
-
 ### The conceptual structure and context - Co-Word Analysis
 
 Co-word networks show the conceptual structure, that uncovers links between concepts through term co-occurences.
@@ -889,18 +886,21 @@ NetMatrix <- biblioNetwork(M,
                            analysis = "co-occurrences", 
                            network = "keywords", 
                            sep = ";")
+```
 
-net <- networkPlot(NetMatrix, 
-                   normalize = "association", 
-                   n = 50, 
-                   Title = "Keyword Co-occurrences", 
-                   type = "fruchterman", 
-                   size.cex = TRUE, size = 20, remove.multiple = FALSE, 
-                   edgesize = 10, 
-                   labelsize = 3,
-                   label.cex = TRUE,
-                   label.n = 50,
-                   edges.min = 2)
+
+```{r}
+# net <- networkPlot(NetMatrix, 
+#                    normalize = "association", 
+#                    n = 50, 
+#                    Title = "Keyword Co-occurrences", 
+#                    type = "fruchterman", 
+#                    size.cex = TRUE, size = 20, remove.multiple = FALSE, 
+#                    edgesize = 10, 
+#                    labelsize = 3,
+#                    label.cex = TRUE,
+#                    label.n = 50,
+#                    edges.min = 2)
 ```
 
 
@@ -936,24 +936,7 @@ NetMatrix <- biblioNetwork(M,
 
 S <- normalizeSimilarity(NetMatrix, 
                          type = "association")
-
-net <- networkPlot(S,
-                   n = 500, 
-                   Title = "Keyword co-occurrences",
-                   type = "fruchterman",
-                   labelsize = 2, 
-                   halo = FALSE,
-                   cluster = "walktrap", 
-                   remove.isolates = FALSE,
-                   remove.multiple = FALSE, 
-                   noloops = TRUE, 
-                   weighted = TRUE,
-                   label.cex = TRUE,
-                   edgesize = 5, 
-                   size = 1,
-                   edges.min = 2)
 ```
-
 
 
 ```{r ThematicMap, fig.height15, fig.width=15}
