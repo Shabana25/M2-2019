@@ -43,11 +43,11 @@ Column 1 contains the ID of the **ego** (from wehere the edge starts), and colum
 * This networks are generated from the corresponding edgelists
 * Also attach node characteristics from the corresponding nodelist
 
-## Analysis
+## 2. Analysis
 
 Make a little analysis on:
 
-### Network level characteristics
+### A: Network level characteristics
 
 Find the overal network level of:
 
@@ -55,28 +55,38 @@ Find the overal network level of:
 * Transistivity (Clustering Coefficient)
 * Reciprocity
 
-... for the different networks. Interpret the results. Answer the following questions: Are relationships like friendship and advice giving usually reciprocal? Are friends of your friends also your friends?
+... for the different networks. Describe and interpret the results. Answer the following questions: 
 
-### Node level characteristics
+* Are relationships like friendship and advice giving usually reciprocal? 
+* Are friends of your friends also your friends?
+* Are the employees generally more likely to be in a friendship or advice-seeking relationship?
 
-Likewise, find out who is most popular in the networks. Who is the most wanted friend, and advice giver? And: Are managers in higher hirarchy more popular?
+### B: Node level characteristics
 
-### Relational Characteristics
+Likewise, find out:
 
-Are managers from the same department, or on the same hirarchy, age, or tenuere more likely to become friends or give each others advice?
+* Who is most popular in the networks. Who is the most wanted friend, and advice giver? 
+* Are managers in higher hirarchy more popular as friend, and advice giver?
 
-### Aggregated Networks
+### C: Relational Characteristics
 
-Reconstruct the advice and friendship network on the level of departments, where nodes represent departments and edges the number of cross departmental friendships/advice relationships.
+Answer the following questions:
 
-## Visualization
+* Are managers from the same 1. department, or on the same 2. hirarchy, 3. age, or 4. tenuere more likely to become friends or give advice? (hint: assortiativity related) 
+* Are friends more likely to give each others advice?
 
-Everything goes. Show us some pretty and informative plots. Choose what to plot, and how, on your own. Interpret the results and share some cool insights.
+### 3. Aggregated Networks
+
+Reconstruct the advice and friendship network on the aggregated level of departments, where nodes represent departments and edges the number of cross departmental friendships/advice relationships.
+
+## 4. Visualization
+
+Everything goes. Show us some pretty and informative plots. Choose what to plot, and how, on your own. Interpret the results and share some insights.
 
 
 # Deliverables
 
-Please submit a PDF or HTML version of your notebook on peergrade.io (if you submit HTML, please zip it before - large embedded HTMLs from cause crashing when oppened directly in peergrade). In adittion, include a link to a functioning google colab notebook. Please make sure (i.e. own test in “anonymous” setting in your browser) that others can access it.
+Please submit a PDF or HTML version of your notebook on peergrade.io (if you submit HTML, please zip it before - large embedded HTMLs from cause crashing when oppened directly in peergrade). In adittion, include a link to a functioning google colab notebook (mandatory). Please make sure it runs without errors and others can access it (i.e. own test in “anonymous” setting in your browser) .
 
 This notebook should:
 
@@ -96,6 +106,7 @@ This notebook should:
 General
 
 * Keep in mind, you are looking in all cases at directed and unweighted networks.
+* To create networks on a higher lecel of aggregation, you want to aggregate the edgelist the corresponding level before creating a network.
 
 R 
 
