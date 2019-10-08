@@ -19,7 +19,7 @@ SDS Module 2: Working with Relational and Language Data
 
 * Exercises
 
-    * Exercise 1: Directed networks basics [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/exercises/M2_3_network_analysis_advanced_ex1.ipynb#offline=true&sandboxMode=true)
+    * Exercise 1: 2 mode networks bibliometrics [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/exercises/M2_3_network_analysis_advanced_ex1.ipynb#offline=true&sandboxMode=true)
 
 
 
