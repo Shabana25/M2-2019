@@ -112,4 +112,9 @@ R
 
 * Use `fread` from the `data.table` package to conveniently read the files
 
+Python
+
+* Use Pandas for aggregations (if needed) and then create new graphs
+* Use the ```Networkx``` documentation/reference (e.g. [assortativity](https://networkx.github.io/documentation/stable/reference/algorithms/assortativity.html))  to look up the functionality of algorithms that have been covered in the lectures but not explicitly in Python examples or DC courses.
+
 
