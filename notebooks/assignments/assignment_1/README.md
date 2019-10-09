@@ -4,7 +4,7 @@ Daniel S. Hain (<dsh@business.aau.dk>) & Roman Jurowetzki (<roman@business.aau.d
 
 # Introduction
 
-In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2019/tree/master/notebooks/assignments/assignment_1/data)
+In your first assignment in M2, you will replicate a well known network analysis, with different data and some twists. The data is to be found [HERE](https://github.com/SDS-AAU/M2-2019/tree/master/notebooks/assignments/assignment_1/data) (Hint: You neet to download the `raw` data)
 # Data: What do I get?
 
 ## Background
@@ -19,13 +19,13 @@ The company manufactured high-tech equipment on the west coast of the United Sta
 
 The dataset includes 4 files - 3xKrack-High-Tec and 1x High-Tec-Attributes.
 
-**Krack-High-Tec** includes the following three 21x21 text matrices: 
+**Krack-High-Tec** includes the following three 21x3 text matrices: 
 
-* ADVICE non-symmetric, binary
-* FRIENDSHIP non-symmetric, binary
-* REPORTS_TO non-symmetric, binary
+* ADVICE, directed, binary
+* FRIENDSHIP, directed, binary
+* REPORTS_TO, directed, binary
 
-Column 1 contains the ID of the **ego** (from wehere the edge starts), and column 3 the **alter** (to which the edge goes). Column 3 indicates the presence (=1) or absence (=0) of an edge.
+Column 1 contains the ID of the **ego** (from wehere the edge starts), and column 2 the **alter** (to which the edge goes). Column 3 indicates the presence (=1) or absence (=0) of an edge.
 
 **High-Tec-Attributes** includes one 21x4 valued matrix.
 
@@ -111,6 +111,7 @@ General
 R 
 
 * Use `fread` from the `data.table` package to conveniently read the files
+* There are packages and procedures for node and edge aggregation in `R` on graph objects, but the easiest way would be to use `dplyr` to already perform aggregations on the dataframes before creating a graph object.
 
 Python
 
