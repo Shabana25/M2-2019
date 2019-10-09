@@ -45,3 +45,16 @@ SDS Module 2: Working with Relational and Language Data
 
 #### Network Analysis in Python
 
+
+### Natural Language Processing
+
+#### General
+
+#### Network Analysis in R
+
+* [Text Mining with R: A Tidy Approach](https://www.tidytextmining.com/)
+
+#### Network Analysis in Python
+
+
+
