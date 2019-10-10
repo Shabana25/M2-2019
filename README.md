@@ -17,13 +17,11 @@ SDS Module 2: Working with Relational and Language Data
 
 ### [Introduction to Network Analysis Part III (R)](https://raw.githack.com/SDS-AAU/M2-2019/master/notebooks/M2_3_network_analysis_advanced.html) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/M2_3_network_analysis_advanced.ipynb#offline=true&sandboxMode=true)
 
-### Introduction to Network Analysis - Instagram Analysis(Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/network_analysis_and_the_gram.ipynb#offline=true&sandboxMode=true)
-
 * Exercises
 
     * Exercise 1: 2 mode networks bibliometrics [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/exercises/M2_3_network_analysis_advanced_ex1.ipynb#offline=true&sandboxMode=true)
 
-
+### Introduction to Network Analysis - Instagram Analysis(Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/network_analysis_and_the_gram.ipynb#offline=true&sandboxMode=true)
 
 
 
@@ -50,11 +48,11 @@ SDS Module 2: Working with Relational and Language Data
 
 #### General
 
-#### Network Analysis in R
+#### Natural Language Processing in R
 
 * [Text Mining with R: A Tidy Approach](https://www.tidytextmining.com/)
 
-#### Network Analysis in Python
+#### Natural Language Processing in Python
 
 
 
