@@ -23,8 +23,13 @@ SDS Module 2: Working with Relational and Language Data
 
 ### Introduction to Network Analysis - Instagram Analysis(Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/network_analysis_and_the_gram.ipynb#offline=true&sandboxMode=true)
 
-### Introduction to Natural Language Processing (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/NLP_Intro_2019.ipynb)
+### Introduction to Natural Language Processing (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/NLP_Intro_2019.ipynb#offline=true&sandboxMode=true)
 (Too much stuff - too little time)
+
+### Supervised ML & NLP (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/NLP_supervised_and_other_text_based_fun.ipynb#offline=true&sandboxMode=true)
+
+### Training custom word-embeddings (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/training_word2vec_%26_co_on_custom_text.ipynb#offline=true&sandboxMode=true)
+
 
 
 
