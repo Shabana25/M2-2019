@@ -482,7 +482,7 @@ Now its time to talk about an interesting type of networks, multi-modal. This me
 
 We can alalyse them in sepperation (and sometimes we should), but often its helpful to "project"" them onto one mode. Here, we create a node in one mode by joint association with another mode.
 
-![](https://www.dropbox.com/s/e4vnq7kh24pyu0t/networks_2mode.png?dl=1{width=500px}
+![](https://www.dropbox.com/s/e4vnq7kh24pyu0t/networks_2mode.png?dl=1){width=500px}
 
 While that sounds simple, it can be a very powerful technique, as I will demonstrate now.
 

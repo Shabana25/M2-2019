@@ -1,0 +1,83 @@
+---
+title: 'M2-8: Natural Language Processing: Case Studies (R)'
+author: "Daniel S. Hain (dsh@business.aau.dk)"
+date: "Updated `r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+### Generic preamble
+Sys.setenv(LANG = "en") # For english language
+options(scipen = 5) # To deactivate annoying scientific number notation
+set.seed(1337) # To have a seed defined for reproducability
+
+### Knitr options
+if (!require("knitr")) install.packages("knitr"); library(knitr) # For display of the markdown
+knitr::opts_chunk$set(warning=FALSE,
+                     message=FALSE,
+                     fig.align="center"
+                     )
+
+### Install packages if necessary
+if (!require("pacman")) install.packages("pacman") # package for loading and checking packages :)
+pacman::p_load(tidyverse, # Standard datasciewnce toolkid (dplyr, ggplot2 et al.)
+               magrittr, # For advanced piping (%>% et al.)
+               igraph, # For network analysis
+               tidygraph, # For tidy-style graph manipulation
+               ggraph, # For ggplot2 style graph plotting
+               Matrix, # For matrix tooling
+               bibliometrix, # for bibliometric analysis
+               data.table # for fast data manipulation
+               )
+```
+
+In this session, you will learn:
+
+1. What are alternative ways to create network structures.
+2. What are different options to visualize networks and highlight properties.
+3. How to analyse multi-modal networks.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Your turn
+Please do **Exercise 1** in the corresponding section on `Github`. This time you are about to do your own bibliographic analysis!
+
+# Endnotes
+
+### References
+
+### More info
+You can find more info about:
+
+* `tidygraph` [here](https://tidygraph.data-imaginist.com/)
+
+
+### Session info
+```{r}
+sessionInfo()
+```
