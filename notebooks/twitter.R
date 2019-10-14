@@ -48,20 +48,19 @@ token <- create_token(
 
 rate_limit(token)
 
-terms <- c("#r", "#rstats", "#rstudio", "#tidyverse", "#tidytuesday", "#rladies", "#ggplot", "#tidygraph", "#ggraph")
-
-
+terms <- c("#rstats", "#rstudio", "#tidyverse", "#tidytuesday", "#rladies", "#ggplot", "#tidygraph", "#ggraph", 
+           "tidytext", "quanteda", "#spaCy", "NLP", "#dataviz", "machinelearning")
 
 # Search tweets
 rstats_tweets <- search_tweets(q = paste(terms, collapse = " OR "),
-                               n = 18000, 
+                               n = 30000, 
                                include_rts = FALSE,
                                verbose = TRUE,
                                retryonratelimit = TRUE,
                                lang = "en",
                                token = token)
 
-saveRDS(rstats_tweets, "rstats_tweets_no_rt.rds")
+saveRDS(rstats_tweets, "data/rstats_tweets_no_rt.rds")
 
 tweets <- rstats_tweets
 rm(rstats_tweets)
