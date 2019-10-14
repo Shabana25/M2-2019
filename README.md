@@ -39,7 +39,7 @@ SDS Module 2: Working with Relational and Language Data
 
 ## Asignments
 * [Assignment 1](https://github.com/SDS-AAU/M2-2019/tree/master/notebooks/assignments/assignment_1)
-
+* [Assignment 2](https://github.com/SDS-AAU/M2-2019/tree/master/notebooks/assignments/assignment_2)
     
 ## Tutorials & Knowledge
 
