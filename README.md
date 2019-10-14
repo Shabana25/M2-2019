@@ -23,6 +23,8 @@ SDS Module 2: Working with Relational and Language Data
 
 ### Introduction to Network Analysis - Instagram Analysis(Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/network_analysis_and_the_gram.ipynb#offline=true&sandboxMode=true)
 
+## Part II: Natural Language Processing & working with text data & Working with relational data
+
 ### Introduction to Natural Language Processing (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/NLP_Intro_2019.ipynb#offline=true&sandboxMode=true)
 (Too much stuff - too little time)
 
@@ -30,7 +32,7 @@ SDS Module 2: Working with Relational and Language Data
 
 ### Training custom word-embeddings (Python) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/training_word2vec_%26_co_on_custom_text.ipynb#offline=true&sandboxMode=true)
 
-
+### [Natural language Processing: Case Studies (R)](https://raw.githack.com/SDS-AAU/M2-2019/master/notebooks/M2_8_NLP_case.html) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SDS-AAU/M2-2019/blob/master/notebooks/M2_8_NLP_case.ipynb#offline=true&sandboxMode=true)
 
 
 # Further Resources
